@@ -121,6 +121,11 @@ namespace AES1
             Console.WriteLine(BitConverter.ToString(state));
         }
 
+        public string ByteArrayToStr(byte[] state)
+        {
+            return BitConverter.ToString(state);
+        }
+
 
         public void AddRoundKey(ref byte[,] state, Word[] ks, int round)
         {
@@ -258,7 +263,7 @@ namespace AES1
 
             while (i < Nb * (Nr + 1))
             {
-                temp = w[i - 1];
+                    temp = w[i - 1];
                 if (i % Nk == 0)
                 {
                     temp = RotWord(temp);

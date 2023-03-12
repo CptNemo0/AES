@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AES1
 {
-    internal class AESDecipher
+    public class AESDecipher
     {
         private Utils slh;
         
