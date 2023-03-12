@@ -48,6 +48,7 @@ public class Program
    
     public static void Main()
     {
+        
         Utils slh = new Utils();
         AESCipher cipher = new AESCipher(slh);
         AESDecipher decipher = new AESDecipher(slh); 
@@ -70,5 +71,7 @@ public class Program
         byte[] output2 = slh.StateToBlock(initial);
         Console.Write("Inverse cipher text (plaintext): ");
         slh.PrintByteArray(output2);
+        
+
     }
 }
