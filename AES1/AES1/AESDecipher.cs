@@ -15,6 +15,17 @@ namespace AES1
             this.slh = slh;
         }
 
+        public void InvSubBytes(ref byte[,] state)
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                for (int j = 0; j < 4; j++)
+                {
+                    state[i, j] = slh.GetInvSubstituteByte(state[i, j]);
+                }
+            }
+        }
+
         public void InvShiftRows(ref byte[,] state)
         {
             byte s0 = state[1, 0];
@@ -46,18 +57,6 @@ namespace AES1
             state[3, 1] = s2;
             state[3, 2] = s3;
             state[3, 3] = s0;
-        }
-
-
-        public void InvSubBytes(ref byte[,] state)
-        {
-            for (int i = 0; i < 4; i++)
-            {
-                for (int j = 0; j < 4; j++)
-                {
-                    state[i, j] = slh.GetInvSubstituteByte(state[i, j]);
-                }
-            }
         }
     
         public void InvMixColumns(ref byte[,] state)

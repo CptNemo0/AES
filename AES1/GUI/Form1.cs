@@ -132,7 +132,7 @@ namespace GUI
             }
         }
 
-        private void decryptButton_Click(object sender, EventArgs e)
+        private void decryptButton_Click(object sender, EventArgs e) 
         {
             if(ciphertextBox.Text.Length == 0)
             {

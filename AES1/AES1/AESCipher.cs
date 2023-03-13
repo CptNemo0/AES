@@ -8,13 +8,17 @@ namespace AES1
 {
     public class AESCipher
     {
-        public Utils slh;
+        // santa's little helper :)
+        private Utils slh;
 
         public AESCipher(Utils slh)
         {
             this.slh = slh;
         }
 
+        // SubBytes() is a nonlionear transformation.
+        // It uses Substitution box (S - box) to replace every byte in state. 
+        // Further explaination in GetSubstituteByte() function.
         public void SubBytes(ref byte[,] state)
         {
             for (int i = 0; i < 4; i++)
@@ -26,6 +30,10 @@ namespace AES1
             }
         }
 
+        // ShiftRows() performs cyclic permutation on rows 1, 2, 3.
+        // Let's imagine that each row is a queue.
+        // We take 0 element in row 1 pop it, and than push it in the end, so that 1th element becomes new 0, 2nd new 1st, 3rd new 2nd.
+        // For row 2 we do the same, but with first 2 elements, and for 3rd row analogicaly.
         public void ShiftRows(ref byte[,] state)
         {
             byte s0 = state[1, 0];
@@ -59,6 +67,7 @@ namespace AES1
             state[3, 3] = s2;
         }
 
+        // Transformation in the Cipher that takes all of the columns of the State and mixes their data (independently of one another) to produce new columns.
         public void MixColumns(ref byte[,] state)
         {
             int[] helper_array = new int[4];
@@ -75,7 +84,7 @@ namespace AES1
                 }
             }
         }
-        
+
         public byte[,] Cipher(byte[,] input, Word[] KeyScheadule, int Nk)
         {
             byte[,] state = input;

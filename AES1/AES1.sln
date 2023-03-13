@@ -5,7 +5,9 @@ VisualStudioVersion = 17.3.32901.215
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AES", "AES1\AES.csproj", "{51BE2A30-D694-4D41-8914-93314FF19AD6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GUI", "GUI\GUI.csproj", "{D2DAD405-6C94-41BD-8972-B9C071CAF205}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GUI", "GUI\GUI.csproj", "{D2DAD405-6C94-41BD-8972-B9C071CAF205}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{7745CAD4-0624-49AE-A382-9C86EB754155}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{D2DAD405-6C94-41BD-8972-B9C071CAF205}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D2DAD405-6C94-41BD-8972-B9C071CAF205}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D2DAD405-6C94-41BD-8972-B9C071CAF205}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7745CAD4-0624-49AE-A382-9C86EB754155}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7745CAD4-0624-49AE-A382-9C86EB754155}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7745CAD4-0624-49AE-A382-9C86EB754155}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7745CAD4-0624-49AE-A382-9C86EB754155}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

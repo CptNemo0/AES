@@ -44,6 +44,8 @@ public class Program
 
     public static byte[] testKey2 = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17 }; //Nk = 6
 
+    public static byte[] testKey3 = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17 }; // Nk = 8
+
     public static byte[] testPlaintext = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
    
     public static void Main()
@@ -54,24 +56,20 @@ public class Program
         AESDecipher decipher = new AESDecipher(slh); 
         Word[] KeyScheadule = slh.KeyExpansion(testKey2);
 
-        Console.Write("Cipher Key: ");
-        slh.PrintByteArray(testKey2);
-
-        Console.Write("Plaintext : ");
-        slh.PrintByteArray(testPlaintext);
-
+        Console.Write("Cipher Key: " + slh.ByteArrayToStr(testKey3));
+        Console.Write("Plaintext : " + slh.ByteArrayToStr(testPlaintext));
+        
         byte[,] test = slh.BlockToState(testPlaintext);
         
         byte[,] complete1 = cipher.Cipher(slh.BlockToState(testPlaintext), KeyScheadule, 6);
         byte[] output = slh.StateToBlock(complete1);
-        Console.Write("Cipher text : ");
-        slh.PrintByteArray(output);
+        Console.Write("Cipher text : " + slh.ByteArrayToStr(output));
+        
 
         byte[,] initial = decipher.InvCipher(slh.BlockToState(output), KeyScheadule, 6);
         byte[] output2 = slh.StateToBlock(initial);
-        Console.Write("Inverse cipher text (plaintext): ");
-        slh.PrintByteArray(output2);
+        Console.Write("Inverse cipher text (plaintext): " + slh.ByteArrayToStr(output2));
         
-
+        
     }
 }

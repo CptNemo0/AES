@@ -50,6 +50,7 @@ namespace AES1
             { 0x17, 0x2B, 0x04, 0x7E, 0xBA, 0x77, 0xD6, 0x26, 0xE1, 0x69, 0x14, 0x63, 0x55, 0x21, 0x0C, 0x7D }
         };
 
+        //Returns randomly generated key
         public byte[] getCipherKey(int Nk)
         {
             int len = 0;
@@ -79,23 +80,13 @@ namespace AES1
             return key;
         }
 
-        
-        public byte[] MessageInBinary(string message, Encoding encoding)
+        //Transforms string to byte array
+        public byte[] StringToByteArray(string message, Encoding encoding)
         {
             return encoding.GetBytes(message);
         }
 
-        public byte[] ConvertToByteArray(string str, Encoding encoding)
-        {
-            return encoding.GetBytes(str);
-        }
-
-        public String ToBinary(Byte[] data)
-        {
-            return string.Join("", data.Select(byt => Convert.ToString(byt, 2).PadLeft(8, '0')));
-        }
-
-        
+        //Transforms byte[] to byte[,]
         public byte[,] BlockToState(byte[] block)
         {
             byte[,] retValue = { { block[0], block[4], block[8], block[12] },
@@ -106,6 +97,7 @@ namespace AES1
             return retValue;
         }
 
+        //Transforms byte[,] to byte[]
         public byte[] StateToBlock(byte[,] state)
         {
             byte[] retValue = {
@@ -115,12 +107,7 @@ namespace AES1
             return retValue;
         }
 
-        
-        public void PrintByteArray(byte[] state)
-        {
-            Console.WriteLine(BitConverter.ToString(state));
-        }
-
+        //Returns string representation of byte[]
         public string ByteArrayToStr(byte[] state)
         {
             return BitConverter.ToString(state);
@@ -167,6 +154,7 @@ namespace AES1
 
             return retValue;
         }
+
         //Substitution of singular bit according to S-box
         public byte GetSubstituteByte(byte s)
         {
@@ -186,6 +174,7 @@ namespace AES1
             return retValue;
         }
 
+        //Substitution of singular bit according to InvS-box
         public byte GetInvSubstituteByte(byte s)
         {
             byte retValue = 0;                          // Byte retValue is literall byte - sequention of 8 binary values, in this case 0000 0000.
@@ -231,7 +220,7 @@ namespace AES1
             }
             else
             {
-                return new Word(0x00, 0x00, 0x00, 0x00);
+                throw new Exception("Passed argument is not valid");
             }
         }
 
