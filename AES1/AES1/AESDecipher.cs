@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace AES
+﻿namespace AES
 {
     public class AESDecipher
     {
         private Utils slh;
-        
+
         public AESDecipher(Utils slh)
         {
             this.slh = slh;
@@ -58,7 +52,7 @@ namespace AES
             state[3, 2] = s3;
             state[3, 3] = s0;
         }
-    
+
         public void InvMixColumns(ref byte[,] state)
         {
             int[] help_arr = new int[4];
@@ -85,7 +79,7 @@ namespace AES
 
             slh.AddRoundKey(ref state, KeyScheadule, Nr);
 
-            for(int round = Nr - 1; round > 0; round--)
+            for (int round = Nr - 1; round > 0; round--)
             {
                 InvShiftRows(ref state);
                 InvSubBytes(ref state);

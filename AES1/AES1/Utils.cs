@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace AES
 {
@@ -194,7 +189,6 @@ namespace AES
             return retValue;
         }
 
-
         public Word SubWord(Word w)
         {
             return new Word(GetSubstituteByte(w.w[0]), GetSubstituteByte(w.w[1]), GetSubstituteByte(w.w[2]), GetSubstituteByte(w.w[3]));
@@ -253,7 +247,7 @@ namespace AES
 
             while (i < Nb * (Nr + 1))
             {
-                    temp = w[i - 1];
+                temp = w[i - 1];
                 if (i % Nk == 0)
                 {
                     temp = RotWord(temp);

@@ -1,8 +1,4 @@
 using AES;
-using System.Collections;
-using System.Drawing;
-using System.Text;
-using System.Windows.Forms;
 
 namespace GUI
 {
@@ -10,24 +6,16 @@ namespace GUI
     {
         private Utils slh;
         private Data data;
-        private Presentation pres;
-        private AESCipher cipher;
-        private AESDecipher decipher;
-        private string keyPath = "key.bin";
-        private string initialMessagePath = "message.bin";
-        private string encodedPath = "encoded.bin";
-        private string decodedPath = "decoded.bin";
-
+        private readonly string keyPath = "key.bin";
+        private readonly string initialMessagePath = "message.bin";
+        private readonly string encodedPath = "encoded.bin";
+        private readonly string decodedPath = "decoded.bin";
 
         public AES_Cipher_Tool()
         {
             data = new Data();
             slh = new Utils();
-            pres = new Presentation();
-            cipher = new AESCipher(slh);
-            decipher = new AESDecipher(slh);
             InitializeComponent();
-
         }
 
         private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
@@ -91,7 +79,7 @@ namespace GUI
 
                 using (BinaryWriter writer = new BinaryWriter(File.Open(encodedPath, FileMode.Create)))
                 {
-                    Ihavenoideaforname ihavenoideaforname = new Ihavenoideaforname();
+                    AES.AES ihavenoideaforname = new AES.AES();
                     byte[] byteArray = ihavenoideaforname.encode(message_1, data.getCipherKey());
                     writer.Write(byteArray);
                     string strFromFile = System.Text.Encoding.UTF8.GetString(byteArray);
@@ -125,7 +113,7 @@ namespace GUI
 
             using (BinaryWriter writer = new BinaryWriter(File.Open(decodedPath, FileMode.Create)))
             {
-                Ihavenoideaforname ihavenoideaforname = new Ihavenoideaforname();
+                AES.AES ihavenoideaforname = new AES.AES();
                 byte[] byteArray = ihavenoideaforname.decode(message_1, data.getCipherKey());
                 writer.Write(byteArray);
             }
@@ -281,7 +269,7 @@ namespace GUI
                 using (BinaryReader reader = new BinaryReader(File.Open(fileName, FileMode.Open)))
                 {
                     data.setMessageBytes(reader.ReadBytes((int)reader.BaseStream.Length));
-                }                
+                }
             }
 
             using (BinaryWriter writer = new BinaryWriter(File.Open(initialMessagePath, FileMode.Create)))
