@@ -1,4 +1,4 @@
-﻿namespace AES
+﻿namespace Cipher
 {
     public class Data
     {

@@ -1,2 +1,2 @@
-global using AES;
+global using Cipher;
 global using Microsoft.VisualStudio.TestTools.UnitTesting;

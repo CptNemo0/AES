@@ -1,7 +1,7 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
 
-namespace AES
+namespace Cipher
 {
     public class Utils
     {

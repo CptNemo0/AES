@@ -1,7 +1,10 @@
-﻿public class Program
+﻿namespace Cipher
 {
-    public static void Main()
+    public class Program
     {
-        Console.WriteLine("God created Arrakis to train the faithful.");
+        public static void Main()
+        {
+            Console.WriteLine("God created Arrakis to train the faithful.");
+        }
     }
 }

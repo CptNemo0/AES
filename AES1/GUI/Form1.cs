@@ -1,4 +1,4 @@
-using AES;
+using Cipher;
 
 namespace GUI
 {
@@ -79,7 +79,7 @@ namespace GUI
 
                 using (BinaryWriter writer = new BinaryWriter(File.Open(encodedPath, FileMode.Create)))
                 {
-                    AES.AES ihavenoideaforname = new AES.AES();
+                    Cipher.AES ihavenoideaforname = new AES();
                     byte[] byteArray = ihavenoideaforname.encode(message_1, data.getCipherKey());
                     writer.Write(byteArray);
                     string strFromFile = System.Text.Encoding.UTF8.GetString(byteArray);
@@ -113,7 +113,7 @@ namespace GUI
 
             using (BinaryWriter writer = new BinaryWriter(File.Open(decodedPath, FileMode.Create)))
             {
-                AES.AES ihavenoideaforname = new AES.AES();
+                Cipher.AES ihavenoideaforname = new AES();
                 byte[] byteArray = ihavenoideaforname.decode(message_1, data.getCipherKey());
                 writer.Write(byteArray);
             }
