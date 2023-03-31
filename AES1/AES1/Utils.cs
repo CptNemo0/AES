@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace AES1
+namespace AES
 {
     public class Utils
     {
@@ -81,8 +82,9 @@ namespace AES1
         }
 
         //Transforms string to byte array
-        public byte[] StringToByteArray(string message, Encoding encoding)
+        public byte[] StringToByteArray(string message)
         {
+            Encoding encoding = new UTF8Encoding();
             return encoding.GetBytes(message);
         }
 
@@ -107,12 +109,11 @@ namespace AES1
             return retValue;
         }
 
-        //Returns string representation of byte[]
-        public string ByteArrayToStr(byte[] state)
+        //Returns string representation of byte[] but in hex
+        public string ByteArrayToStr(byte[] block)
         {
-            return BitConverter.ToString(state);
+            return BitConverter.ToString(block).Replace("-", "").ToLower();
         }
-
 
         public void AddRoundKey(ref byte[,] state, Word[] ks, int round)
         {

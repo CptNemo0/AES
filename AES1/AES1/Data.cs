@@ -1,11 +1,10 @@
-﻿using AES1;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GUI
+namespace AES
 {
     public class Data
     {
@@ -31,14 +30,14 @@ namespace GUI
             messageCiphered = new byte[1];
             messageCiphered[0] = 0;
 
-            Nk = 0;
+            Nk = 4;
             KeyScheadule = new Word[1];
 
             messageCipheredString = "Initialization";
 
             stringBuilder = new StringBuilder();
         }
-
+        
         public byte[] getCipherKey()
         {
             return cipherKey;

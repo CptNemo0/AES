@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static System.Windows.Forms.AxHost;
 
-namespace GUI
+namespace AES
 {
     public class Presentation
     {
@@ -36,8 +35,7 @@ namespace GUI
                              .Where(x => x % 2 == 0)
                              .Select(x => Convert.ToByte(hexString.Substring(x, 2), 16))
                              .ToArray();
-            string readableString = Encoding.ASCII.GetString(byteArray);
-            return readableString;
+            return Encoding.UTF8.GetString(byteArray);  
         }
     }
 }

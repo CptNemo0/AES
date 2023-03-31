@@ -1,4 +1,5 @@
-using AES1;
+using AES;
+using System.Collections;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
@@ -12,6 +13,12 @@ namespace GUI
         private Presentation pres;
         private AESCipher cipher;
         private AESDecipher decipher;
+        private string keyPath = "key.bin";
+        private string initialMessagePath = "message.bin";
+        private string encodedPath = "encoded.bin";
+        private string decodedPath = "decoded.bin";
+
+
         public AES_Cipher_Tool()
         {
             data = new Data();
@@ -25,163 +32,109 @@ namespace GUI
 
         private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (listBox1.SelectedIndex == 0) 
+
+            data.setCipherKey(slh.getCipherKey(data.getNk()));
+            using (BinaryWriter writer = new BinaryWriter(File.Open(keyPath, FileMode.Create)))
             {
-                lenBox.Enabled = true;
-                lenBox.Visible = true;
+                writer.Write(data.getCipherKey());
             }
-            else
+
+            using (BinaryReader reader = new BinaryReader(File.Open(keyPath, FileMode.Open)))
             {
-                lenBox.Enabled = false;
-                lenBox.Visible = false;
-                keyBox.Text = "";
-                byte[] temp = new byte[1];
-                temp[0] = 0;
-                data.setCipherKey(temp);
-                data.setNk(0);
+                byte[] key = reader.ReadBytes((int)reader.BaseStream.Length);
+                keyBox.Text = System.Text.Encoding.UTF8.GetString(key);
             }
+
         }
 
         private void lenBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if(lenBox.SelectedIndex == 0)
+            if (lenBox.SelectedIndex == 0)
             {
-                byte[] key = slh.getCipherKey(4);
-                data.setCipherKey(key);
                 data.setNk(4);
-                keyBox.Text = pres.ByteArrayToString(data.getCipherKey());
-                encryptButton.Enabled = true;
             }
-            else if(lenBox.SelectedIndex == 1)
+            else if (lenBox.SelectedIndex == 1)
             {
-                byte[] key = slh.getCipherKey(6);
-                data.setCipherKey(key);
                 data.setNk(6);
-                keyBox.Text = pres.ByteArrayToString(data.getCipherKey());
-                encryptButton.Enabled = true;
             }
-            else
+            else if (lenBox.SelectedIndex == 2)
             {
-                byte[] key = slh.getCipherKey(8);
-                data.setCipherKey(key);
                 data.setNk(8);
-                keyBox.Text = pres.ByteArrayToString(data.getCipherKey());
-                encryptButton.Enabled = true;
             }
         }
 
         private void mainButton_Click(object sender, EventArgs e)
         {
-            if(plaintextBox.Text.Length == 0)
+            if (plaintextBox.Text.Length > 0)
             {
-             //alert
-            }
-            else
-            {
-                ciphertextBox.Text = "";
-                StringBuilder a = new StringBuilder();
-                data.setStringBuilder(a);
+                using (BinaryReader reader = new BinaryReader(File.Open(keyPath, FileMode.Open)))
+                {
+                    byte[] key = reader.ReadBytes((int)reader.BaseStream.Length);
+                    data.setNk(key.Length / 32);
+                    data.setCipherKey(key);
+                }
 
                 data.setMessageString(plaintextBox.Text);
-                data.setMessageBytes(Encoding.Default.GetBytes(plaintextBox.Text));
-                data.setKeyScheadule(slh.KeyExpansion(data.getCipherKey()));
 
-                int length = 0;
-
-                if((int)(data.getMessageBytes().Length / 16) == 0)
+                using (BinaryWriter writer = new BinaryWriter(File.Open(initialMessagePath, FileMode.Create)))
                 {
-                    length = 16;
-                }
-                else if((data.getMessageBytes().Length % 16) != 0)
-                {
-                    length = data.getMessageBytes().Length + 16;
-                }
-                else
-                {
-                    length = data.getMessageBytes().Length;
+                    byte[] byteArray = System.Text.Encoding.UTF8.GetBytes(data.getMessageString());
+                    writer.Write(byteArray);
                 }
 
-                byte[] result = new byte[length];
-                byte[] temp = new byte[length];
-                byte[] block = new byte[16];
-
-                for (int i = 0; i < length; i++)
+                byte[] message_1;
+                using (BinaryReader reader = new BinaryReader(File.Open(initialMessagePath, FileMode.Open)))
                 {
-                    if (i < data.getMessageBytes().Length)
-                    {
-                        temp[i] = data.getMessageBytes()[i];
-                    }
-                    else
-                    {
-                        temp[i] = 0;
-                    }
+                    message_1 = reader.ReadBytes((int)reader.BaseStream.Length);
                 }
 
-                for(int i = 0; i < temp.Length / 16; i++)
-                {
-                    for(int j = 0; j < 16; j++)
-                    {
-                        block[j] = temp[i * 16 + j];
-                    }
 
-                    result = slh.StateToBlock(cipher.Cipher(slh.BlockToState(block), data.getKeyScheadule(), data.getNk()));
-                    data.GetStringBuilder().Append(pres.ByteArrayToString(result));
+                using (BinaryWriter writer = new BinaryWriter(File.Open(encodedPath, FileMode.Create)))
+                {
+                    Ihavenoideaforname ihavenoideaforname = new Ihavenoideaforname();
+                    byte[] byteArray = ihavenoideaforname.encode(message_1, data.getCipherKey());
+                    writer.Write(byteArray);
+                    string strFromFile = System.Text.Encoding.UTF8.GetString(byteArray);
+                    ciphertextBox.Text = strFromFile;
                 }
 
-                ciphertextBox.Text = data.GetStringBuilder().ToString();
+                using (BinaryReader reader = new BinaryReader(File.Open(encodedPath, FileMode.Open)))
+                {
+                    byte[] byteArray = reader.ReadBytes((int)reader.BaseStream.Length);
+                    string strFromFile = System.Text.Encoding.UTF8.GetString(byteArray);
+                    ciphertextBox.Text = strFromFile;
+                }
+
             }
         }
 
-        private void decryptButton_Click(object sender, EventArgs e) 
+        private void decryptButton_Click(object sender, EventArgs e)
         {
-            if(ciphertextBox.Text.Length == 0)
+            using (BinaryReader reader = new BinaryReader(File.Open(keyPath, FileMode.Open)))
             {
-                //alert
+                byte[] key = reader.ReadBytes((int)reader.BaseStream.Length);
+                data.setNk(key.Length / 32);
+                data.setCipherKey(key);
             }
-            else
+
+            byte[] message_1;
+            using (BinaryReader reader = new BinaryReader(File.Open(encodedPath, FileMode.Open)))
             {
-                plaintextBox.Text = "";
-                StringBuilder a = new StringBuilder();
+                message_1 = reader.ReadBytes((int)reader.BaseStream.Length);
+            }
 
-                data.setStringBuilder(a);
-                if(ciphertextBox.Text.Length % 16 == 0)
-                {
-                    data.setCipherKey(pres.HexStringToByteArray(keyBox.Text));
-                }
-                else
-                {
-                    //alert
-                }
-                data.setNk(ciphertextBox.Text.Length / 8);
-                plaintextBox.Text = data.getCipherKey().Length.ToString();
-                data.setMessageString(ciphertextBox.Text);
-                data.setMessageBytes(Encoding.Default.GetBytes(plaintextBox.Text));
-                data.setKeyScheadule(slh.KeyExpansion(data.getCipherKey()));
+            using (BinaryWriter writer = new BinaryWriter(File.Open(decodedPath, FileMode.Create)))
+            {
+                Ihavenoideaforname ihavenoideaforname = new Ihavenoideaforname();
+                byte[] byteArray = ihavenoideaforname.decode(message_1, data.getCipherKey());
+                writer.Write(byteArray);
+            }
 
-                if(ciphertextBox.Text.Length % 16 == 0)
-                {
-                    data.setMessageCipheredString(ciphertextBox.Text);
-                }
-                else
-                {
-                    //alert
-                }
-                data.setMessageCiphered(pres.HexStringToByteArray(data.getMessageCipheredString()));
-
-                byte[] result = new byte[data.getMessageCiphered().Length];
-                byte[] block = new byte[16];
-
-                for (int i = 0; i < data.getMessageCiphered().Length / 16; i++)
-                {
-                    for (int j = 0; j < 16; j++)
-                    {
-                        block[j] = data.getMessageCiphered()[i * 16 + j];
-                    }
-
-                    result = slh.StateToBlock(decipher.InvCipher(slh.BlockToState(block), data.getKeyScheadule(), data.getNk()));
-                    data.GetStringBuilder().Append(pres.ByteArrayToString(result));
-                }
-                plaintextBox.Text = pres.HexStringToString(data.GetStringBuilder().ToString());
+            using (BinaryReader reader = new BinaryReader(File.Open(decodedPath, FileMode.Open)))
+            {
+                byte[] byteArray = reader.ReadBytes((int)reader.BaseStream.Length);
+                string strFromFile = System.Text.Encoding.UTF8.GetString(byteArray);
+                plaintextBox.Text = strFromFile;
             }
         }
 
@@ -199,6 +152,145 @@ namespace GUI
             {
                 e.Handled = true;
             }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            plaintextBox.Text = string.Empty;
+            ciphertextBox.Text = string.Empty;
+        }
+
+        private void saveButton_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Title = "Save Key!";
+            saveFileDialog.Filter = "Bin files (*.bin)|*.bin";
+            saveFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                string fileName = saveFileDialog.FileName;
+
+                using (BinaryReader reader = new BinaryReader(File.Open(keyPath, FileMode.Open)))
+                {
+                    byte[] key = reader.ReadBytes((int)reader.BaseStream.Length);
+                    data.setCipherKey(key);
+                }
+
+                using (BinaryWriter writer = new BinaryWriter(File.Open(fileName, FileMode.Create)))
+                {
+                    writer.Write(data.getCipherKey());
+                }
+            }
+        }
+
+        private void savectButton_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Title = "Save Key!";
+            saveFileDialog.Filter = "Bin files (*.bin)|*.bin";
+            saveFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                string fileName = saveFileDialog.FileName;
+
+                using (BinaryReader reader = new BinaryReader(File.Open(encodedPath, FileMode.Open)))
+                {
+                    byte[] encoded = reader.ReadBytes((int)reader.BaseStream.Length);
+                    data.setMessageCiphered(encoded);
+                }
+
+                using (BinaryWriter writer = new BinaryWriter(File.Open(fileName, FileMode.Create)))
+                {
+                    writer.Write(data.getMessageCiphered());
+                }
+            }
+        }
+
+        private void loadkButton_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Title = "Load Key!";
+            openFileDialog.Filter = "Bin files (*.bin)|*.bin";
+            openFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            openFileDialog.Multiselect = false;
+
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                string fileName = openFileDialog.FileName;
+
+                using (BinaryReader reader = new BinaryReader(File.Open(fileName, FileMode.Open)))
+                {
+                    byte[] key = reader.ReadBytes((int)reader.BaseStream.Length);
+                    data.setCipherKey(key);
+                }
+            }
+
+            using (BinaryWriter writer = new BinaryWriter(File.Open(keyPath, FileMode.Create)))
+            {
+                writer.Write(data.getCipherKey());
+            }
+
+            using (BinaryReader reader = new BinaryReader(File.Open(keyPath, FileMode.Open)))
+            {
+                byte[] key = reader.ReadBytes((int)reader.BaseStream.Length);
+                keyBox.Text = System.Text.Encoding.UTF8.GetString(key);
+            }
+        }
+
+        private void loadctButton_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Title = "Load Key!";
+            openFileDialog.Filter = "Bin files (*.bin)|*.bin";
+            openFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            openFileDialog.Multiselect = false;
+
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                string fileName = openFileDialog.FileName;
+
+                using (BinaryReader reader = new BinaryReader(File.Open(fileName, FileMode.Open)))
+                {
+                    byte[] ciphertext = reader.ReadBytes((int)reader.BaseStream.Length);
+                    data.setMessageCiphered(ciphertext);
+                }
+            }
+
+            using (BinaryWriter writer = new BinaryWriter(File.Open(encodedPath, FileMode.Create)))
+            {
+                byte[] byteArray = data.getMessageCiphered();
+                writer.Write(byteArray);
+                string strFromFile = System.Text.Encoding.UTF8.GetString(byteArray);
+                ciphertextBox.Text = strFromFile;
+            }
+        }
+
+        private void loadptButton_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Title = "Open File";
+            openFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            openFileDialog.Multiselect = false;
+
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                string fileName = openFileDialog.FileName;
+
+                using (BinaryReader reader = new BinaryReader(File.Open(fileName, FileMode.Open)))
+                {
+                    data.setMessageBytes(reader.ReadBytes((int)reader.BaseStream.Length));
+                }                
+            }
+
+            using (BinaryWriter writer = new BinaryWriter(File.Open(initialMessagePath, FileMode.Create)))
+            {
+                writer.Write(data.getMessageBytes());
+            }
+
+            string strFromFile = System.Text.Encoding.UTF8.GetString(data.getMessageBytes());
+            plaintextBox.Text = strFromFile;
         }
     }
 }
