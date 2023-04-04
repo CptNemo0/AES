@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32901.215
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AES", "AES1\AES.csproj", "{51BE2A30-D694-4D41-8914-93314FF19AD6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cipher", "AES1\Cipher.csproj", "{51BE2A30-D694-4D41-8914-93314FF19AD6}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GUI", "GUI\GUI.csproj", "{D2DAD405-6C94-41BD-8972-B9C071CAF205}"
 EndProject

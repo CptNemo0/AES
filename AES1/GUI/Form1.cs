@@ -1,4 +1,9 @@
 using Cipher;
+using System.Collections;
+using System.Security.Cryptography;
+using System.Text;
+using System.Media;
+using System.Windows.Forms;
 
 namespace GUI
 {
@@ -10,12 +15,19 @@ namespace GUI
         private readonly string initialMessagePath = "message.bin";
         private readonly string encodedPath = "encoded.bin";
         private readonly string decodedPath = "decoded.bin";
+        private readonly SoundPlayer hoodclassic;
+        private readonly SoundPlayer awp;
+        private readonly SoundPlayer damnson;
 
         public AES_Cipher_Tool()
         {
             data = new Data();
             slh = new Utils();
+            hoodclassic = new SoundPlayer("hoodclassic.wav");
+            awp = new SoundPlayer("awp.wav");
+            damnson = new SoundPlayer("damnson.wav");
             InitializeComponent();
+            plaintextBox.TextChanged += plaintextBox_TextChanged;
         }
 
         private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
@@ -53,7 +65,8 @@ namespace GUI
 
         private void mainButton_Click(object sender, EventArgs e)
         {
-            if (plaintextBox.Text.Length > 0)
+            
+;            if (plaintextBox.Text.Length > 0)
             {
                 using (BinaryReader reader = new BinaryReader(File.Open(keyPath, FileMode.Open)))
                 {
@@ -63,6 +76,7 @@ namespace GUI
                 }
 
                 data.setMessageString(plaintextBox.Text);
+
 
                 using (BinaryWriter writer = new BinaryWriter(File.Open(initialMessagePath, FileMode.Create)))
                 {
@@ -75,7 +89,6 @@ namespace GUI
                 {
                     message_1 = reader.ReadBytes((int)reader.BaseStream.Length);
                 }
-
 
                 using (BinaryWriter writer = new BinaryWriter(File.Open(encodedPath, FileMode.Create)))
                 {
@@ -92,12 +105,14 @@ namespace GUI
                     string strFromFile = System.Text.Encoding.UTF8.GetString(byteArray);
                     ciphertextBox.Text = strFromFile;
                 }
-
+                awp.Play();
             }
         }
 
         private void decryptButton_Click(object sender, EventArgs e)
         {
+             hoodclassic.Play();
+
             using (BinaryReader reader = new BinaryReader(File.Open(keyPath, FileMode.Open)))
             {
                 byte[] key = reader.ReadBytes((int)reader.BaseStream.Length);
@@ -105,16 +120,17 @@ namespace GUI
                 data.setCipherKey(key);
             }
 
-            byte[] message_1;
             using (BinaryReader reader = new BinaryReader(File.Open(encodedPath, FileMode.Open)))
             {
-                message_1 = reader.ReadBytes((int)reader.BaseStream.Length);
+                byte[] message_1 = reader.ReadBytes((int)reader.BaseStream.Length);
+                data.setMessageCiphered(message_1);
             }
 
             using (BinaryWriter writer = new BinaryWriter(File.Open(decodedPath, FileMode.Create)))
             {
                 Cipher.AES ihavenoideaforname = new AES();
-                byte[] byteArray = ihavenoideaforname.decode(message_1, data.getCipherKey());
+                byte[] byteArray = ihavenoideaforname.decode(data.getMessageCiphered(), data.getCipherKey());
+                data.setMessageBytes(byteArray);
                 writer.Write(byteArray);
             }
 
@@ -123,7 +139,9 @@ namespace GUI
                 byte[] byteArray = reader.ReadBytes((int)reader.BaseStream.Length);
                 string strFromFile = System.Text.Encoding.UTF8.GetString(byteArray);
                 plaintextBox.Text = strFromFile;
-            }
+
+ 
+            } 
         }
 
         private void keyBox_KeyPress(object sender, KeyPressEventArgs e)
@@ -140,12 +158,6 @@ namespace GUI
             {
                 e.Handled = true;
             }
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            plaintextBox.Text = string.Empty;
-            ciphertextBox.Text = string.Empty;
         }
 
         private void saveButton_Click(object sender, EventArgs e)
@@ -175,7 +187,7 @@ namespace GUI
         private void savectButton_Click(object sender, EventArgs e)
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.Title = "Save Key!";
+            saveFileDialog.Title = "Save Ciphertext!";
             saveFileDialog.Filter = "Bin files (*.bin)|*.bin";
             saveFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
 
@@ -230,7 +242,7 @@ namespace GUI
         private void loadctButton_Click(object sender, EventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Title = "Load Key!";
+            openFileDialog.Title = "Load Ciphertext!";
             openFileDialog.Filter = "Bin files (*.bin)|*.bin";
             openFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             openFileDialog.Multiselect = false;
@@ -257,19 +269,16 @@ namespace GUI
 
         private void loadptButton_Click(object sender, EventArgs e)
         {
+
             OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Title = "Open File";
+            openFileDialog.Title = "Load Plaintext";
             openFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             openFileDialog.Multiselect = false;
 
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
                 string fileName = openFileDialog.FileName;
-
-                using (BinaryReader reader = new BinaryReader(File.Open(fileName, FileMode.Open)))
-                {
-                    data.setMessageBytes(reader.ReadBytes((int)reader.BaseStream.Length));
-                }
+                data.setMessageBytes(File.ReadAllBytes(fileName));
             }
 
             using (BinaryWriter writer = new BinaryWriter(File.Open(initialMessagePath, FileMode.Create)))
@@ -279,6 +288,21 @@ namespace GUI
 
             string strFromFile = System.Text.Encoding.UTF8.GetString(data.getMessageBytes());
             plaintextBox.Text = strFromFile;
+
+            damnson.Play();
+        }
+
+        private void plaintextBox_TextChanged(object sender, EventArgs e)
+        {
+            string input = plaintextBox.Text;
+            byte[] inputBytes = Encoding.UTF8.GetBytes(input);
+
+            using (MD5 md5 = MD5.Create())
+            {
+                byte[] hashBytes = md5.ComputeHash(inputBytes);
+                string hashString = BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
+                checksumBox.Text = hashString;
+            }
         }
     }
 }

@@ -9,7 +9,25 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AES1\AES.csproj" />
+    <None Remove="awp.wav" />
+    <None Remove="damnson.wav" />
+    <None Remove="hoodclassic.wav" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="awp.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="damnson.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="hoodclassic.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AES1\Cipher.csproj" />
   </ItemGroup>
 
 </Project>

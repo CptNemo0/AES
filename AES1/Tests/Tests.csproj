@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AES1\AES.csproj" />
+    <ProjectReference Include="..\AES1\Cipher.csproj" />
   </ItemGroup>
 
 </Project>

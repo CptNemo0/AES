@@ -34,31 +34,34 @@
             keyBox = new TextBox();
             lenBox = new ListBox();
             decryptButton = new Button();
-            button1 = new Button();
             saveButton = new Button();
             savectButton = new Button();
             loadkButton = new Button();
             loadctButton = new Button();
             genkButton = new Button();
             loadptButton = new Button();
+            checksumBox = new TextBox();
             SuspendLayout();
             // 
             // plaintextBox
             // 
+            plaintextBox.AllowDrop = true;
             plaintextBox.BackColor = Color.FromArgb(34, 34, 40);
             plaintextBox.Cursor = Cursors.IBeam;
             plaintextBox.Font = new Font("Arial", 11.25F, FontStyle.Regular, GraphicsUnit.Point);
             plaintextBox.ForeColor = Color.White;
             plaintextBox.Location = new Point(90, 180);
-            plaintextBox.MaximumSize = new Size(420, 420);
-            plaintextBox.MaxLength = 2000000;
-            plaintextBox.MinimumSize = new Size(420, 420);
+            plaintextBox.MaximumSize = new Size(420, 390);
+            plaintextBox.MaxLength = 65535;
+            plaintextBox.MinimumSize = new Size(420, 390);
             plaintextBox.Multiline = true;
             plaintextBox.Name = "plaintextBox";
             plaintextBox.PlaceholderText = "Plaintext ";
-            plaintextBox.Size = new Size(420, 420);
+            plaintextBox.ScrollBars = ScrollBars.Both;
+            plaintextBox.Size = new Size(420, 390);
             plaintextBox.TabIndex = 0;
             plaintextBox.Tag = "plaintextBox";
+            plaintextBox.TextChanged += plaintextBox_TextChanged;
             // 
             // ciphertextBox
             // 
@@ -81,8 +84,9 @@
             // encryptButton
             // 
             encryptButton.BackColor = Color.FromArgb(34, 34, 40);
-            encryptButton.FlatAppearance.BorderColor = Color.Black;
-            encryptButton.FlatAppearance.BorderSize = 2;
+            encryptButton.FlatAppearance.BorderColor = Color.FromArgb(147, 172, 201);
+            encryptButton.FlatAppearance.BorderSize = 3;
+            encryptButton.FlatStyle = FlatStyle.Flat;
             encryptButton.Font = new Font("Arial", 11F, FontStyle.Regular, GraphicsUnit.Point);
             encryptButton.ForeColor = Color.White;
             encryptButton.Location = new Point(575, 295);
@@ -96,13 +100,13 @@
             // keyBox
             // 
             keyBox.BackColor = Color.FromArgb(34, 34, 40);
-            keyBox.Font = new Font("Arial", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            keyBox.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
             keyBox.ForeColor = Color.White;
-            keyBox.Location = new Point(314, 122);
+            keyBox.Location = new Point(310, 130);
             keyBox.Multiline = true;
             keyBox.Name = "keyBox";
             keyBox.PlaceholderText = "Cipher Key";
-            keyBox.Size = new Size(659, 24);
+            keyBox.Size = new Size(660, 24);
             keyBox.TabIndex = 3;
             keyBox.Tag = "keyBox";
             keyBox.TextAlign = HorizontalAlignment.Center;
@@ -110,6 +114,7 @@
             // 
             // lenBox
             // 
+            lenBox.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             lenBox.BackColor = Color.FromArgb(34, 34, 40);
             lenBox.ColumnWidth = 60;
             lenBox.Font = new Font("Arial", 11F, FontStyle.Regular, GraphicsUnit.Point);
@@ -117,18 +122,19 @@
             lenBox.FormattingEnabled = true;
             lenBox.ItemHeight = 17;
             lenBox.Items.AddRange(new object[] { "128 bit", "192 bit", "256 bit" });
-            lenBox.Location = new Point(410, 53);
+            lenBox.Location = new Point(405, 53);
             lenBox.Margin = new Padding(0);
             lenBox.Name = "lenBox";
-            lenBox.Size = new Size(71, 55);
+            lenBox.Size = new Size(90, 55);
             lenBox.TabIndex = 5;
             lenBox.SelectedIndexChanged += lenBox_SelectedIndexChanged;
             // 
             // decryptButton
             // 
             decryptButton.BackColor = Color.FromArgb(34, 34, 40);
-            decryptButton.FlatAppearance.BorderColor = Color.Black;
-            decryptButton.FlatAppearance.BorderSize = 2;
+            decryptButton.FlatAppearance.BorderColor = Color.FromArgb(147, 172, 201);
+            decryptButton.FlatAppearance.BorderSize = 3;
+            decryptButton.FlatStyle = FlatStyle.Flat;
             decryptButton.Font = new Font("Arial", 11F, FontStyle.Regular, GraphicsUnit.Point);
             decryptButton.ForeColor = Color.White;
             decryptButton.Location = new Point(575, 352);
@@ -139,26 +145,17 @@
             decryptButton.UseVisualStyleBackColor = false;
             decryptButton.Click += decryptButton_Click;
             // 
-            // button1
-            // 
-            button1.Location = new Point(603, 266);
-            button1.Name = "button1";
-            button1.Size = new Size(75, 23);
-            button1.TabIndex = 7;
-            button1.Text = "button1";
-            button1.UseVisualStyleBackColor = true;
-            button1.Click += button1_Click;
-            // 
             // saveButton
             // 
             saveButton.BackColor = Color.FromArgb(34, 34, 40);
-            saveButton.FlatAppearance.BorderColor = Color.Black;
-            saveButton.FlatAppearance.BorderSize = 2;
+            saveButton.FlatAppearance.BorderColor = Color.FromArgb(147, 172, 201);
+            saveButton.FlatAppearance.BorderSize = 3;
+            saveButton.FlatStyle = FlatStyle.Flat;
             saveButton.Font = new Font("Arial", 11F, FontStyle.Regular, GraphicsUnit.Point);
             saveButton.ForeColor = Color.White;
-            saveButton.Location = new Point(583, 53);
+            saveButton.Location = new Point(595, 53);
             saveButton.Name = "saveButton";
-            saveButton.Size = new Size(93, 55);
+            saveButton.Size = new Size(90, 55);
             saveButton.TabIndex = 8;
             saveButton.Text = "Save Key";
             saveButton.UseVisualStyleBackColor = false;
@@ -167,13 +164,14 @@
             // savectButton
             // 
             savectButton.BackColor = Color.FromArgb(34, 34, 40);
-            savectButton.FlatAppearance.BorderColor = Color.Black;
-            savectButton.FlatAppearance.BorderSize = 2;
+            savectButton.FlatAppearance.BorderColor = Color.FromArgb(147, 172, 201);
+            savectButton.FlatAppearance.BorderSize = 3;
+            savectButton.FlatStyle = FlatStyle.Flat;
             savectButton.Font = new Font("Arial", 11F, FontStyle.Regular, GraphicsUnit.Point);
             savectButton.ForeColor = Color.White;
-            savectButton.Location = new Point(781, 53);
+            savectButton.Location = new Point(785, 53);
             savectButton.Name = "savectButton";
-            savectButton.Size = new Size(93, 55);
+            savectButton.Size = new Size(90, 55);
             savectButton.TabIndex = 9;
             savectButton.Text = "Save Cipher text";
             savectButton.UseVisualStyleBackColor = false;
@@ -182,13 +180,14 @@
             // loadkButton
             // 
             loadkButton.BackColor = Color.FromArgb(34, 34, 40);
-            loadkButton.FlatAppearance.BorderColor = Color.Black;
-            loadkButton.FlatAppearance.BorderSize = 2;
+            loadkButton.FlatAppearance.BorderColor = Color.FromArgb(147, 172, 201);
+            loadkButton.FlatAppearance.BorderSize = 3;
+            loadkButton.FlatStyle = FlatStyle.Flat;
             loadkButton.Font = new Font("Arial", 11F, FontStyle.Regular, GraphicsUnit.Point);
             loadkButton.ForeColor = Color.White;
-            loadkButton.Location = new Point(682, 53);
+            loadkButton.Location = new Point(690, 53);
             loadkButton.Name = "loadkButton";
-            loadkButton.Size = new Size(93, 55);
+            loadkButton.Size = new Size(90, 55);
             loadkButton.TabIndex = 10;
             loadkButton.Text = "Load Key";
             loadkButton.UseVisualStyleBackColor = false;
@@ -197,13 +196,14 @@
             // loadctButton
             // 
             loadctButton.BackColor = Color.FromArgb(34, 34, 40);
-            loadctButton.FlatAppearance.BorderColor = Color.Black;
-            loadctButton.FlatAppearance.BorderSize = 2;
+            loadctButton.FlatAppearance.BorderColor = Color.FromArgb(147, 172, 201);
+            loadctButton.FlatAppearance.BorderSize = 3;
+            loadctButton.FlatStyle = FlatStyle.Flat;
             loadctButton.Font = new Font("Arial", 11F, FontStyle.Regular, GraphicsUnit.Point);
             loadctButton.ForeColor = Color.White;
             loadctButton.Location = new Point(880, 53);
             loadctButton.Name = "loadctButton";
-            loadctButton.Size = new Size(93, 55);
+            loadctButton.Size = new Size(90, 55);
             loadctButton.TabIndex = 11;
             loadctButton.Text = "Load Cipher text";
             loadctButton.UseVisualStyleBackColor = false;
@@ -212,13 +212,14 @@
             // genkButton
             // 
             genkButton.BackColor = Color.FromArgb(34, 34, 40);
-            genkButton.FlatAppearance.BorderColor = Color.Black;
-            genkButton.FlatAppearance.BorderSize = 2;
+            genkButton.FlatAppearance.BorderColor = Color.FromArgb(147, 172, 201);
+            genkButton.FlatAppearance.BorderSize = 3;
+            genkButton.FlatStyle = FlatStyle.Flat;
             genkButton.Font = new Font("Arial", 11F, FontStyle.Regular, GraphicsUnit.Point);
             genkButton.ForeColor = Color.White;
-            genkButton.Location = new Point(314, 53);
+            genkButton.Location = new Point(310, 53);
             genkButton.Name = "genkButton";
-            genkButton.Size = new Size(93, 55);
+            genkButton.Size = new Size(90, 55);
             genkButton.TabIndex = 12;
             genkButton.Text = "Generate Key";
             genkButton.UseVisualStyleBackColor = false;
@@ -227,31 +228,46 @@
             // loadptButton
             // 
             loadptButton.BackColor = Color.FromArgb(34, 34, 40);
-            loadptButton.FlatAppearance.BorderColor = Color.Black;
-            loadptButton.FlatAppearance.BorderSize = 2;
+            loadptButton.FlatAppearance.BorderColor = Color.FromArgb(147, 172, 201);
+            loadptButton.FlatAppearance.BorderSize = 3;
+            loadptButton.FlatStyle = FlatStyle.Flat;
             loadptButton.Font = new Font("Arial", 11F, FontStyle.Regular, GraphicsUnit.Point);
             loadptButton.ForeColor = Color.White;
-            loadptButton.Location = new Point(484, 53);
+            loadptButton.Location = new Point(500, 53);
             loadptButton.Name = "loadptButton";
-            loadptButton.Size = new Size(93, 55);
+            loadptButton.Size = new Size(90, 55);
             loadptButton.TabIndex = 13;
             loadptButton.Text = "Load Plaintext";
             loadptButton.UseVisualStyleBackColor = false;
             loadptButton.Click += loadptButton_Click;
             // 
+            // checksumBox
+            // 
+            checksumBox.BackColor = Color.FromArgb(34, 34, 40);
+            checksumBox.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            checksumBox.ForeColor = Color.White;
+            checksumBox.Location = new Point(90, 576);
+            checksumBox.Multiline = true;
+            checksumBox.Name = "checksumBox";
+            checksumBox.PlaceholderText = "Checksum";
+            checksumBox.Size = new Size(420, 24);
+            checksumBox.TabIndex = 14;
+            checksumBox.Tag = "checksumBox";
+            checksumBox.TextAlign = HorizontalAlignment.Center;
+            // 
             // AES_Cipher_Tool
             // 
             AutoScaleDimensions = new SizeF(9F, 21F);
             AutoScaleMode = AutoScaleMode.Font;
-            BackColor = Color.FromArgb(26, 26, 32);
+            BackColor = Color.FromArgb(35, 35, 43);
             ClientSize = new Size(1264, 681);
+            Controls.Add(checksumBox);
             Controls.Add(loadptButton);
             Controls.Add(genkButton);
             Controls.Add(loadctButton);
             Controls.Add(loadkButton);
             Controls.Add(savectButton);
             Controls.Add(saveButton);
-            Controls.Add(button1);
             Controls.Add(decryptButton);
             Controls.Add(lenBox);
             Controls.Add(keyBox);
@@ -281,12 +297,12 @@
         private TextBox keyBox;
         private ListBox lenBox;
         private Button decryptButton;
-        private Button button1;
         private Button saveButton;
         private Button savectButton;
         private Button loadkButton;
         private Button loadctButton;
         private Button genkButton;
         private Button loadptButton;
+        private TextBox checksumBox;
     }
 }
