@@ -137,7 +137,6 @@
                 Array.Copy(temp, i * 16, divided[i], 0, 16);
             }
 
-            int z = 0;
             for (int i = 0; i < length / 16; i++)
             {
                 block = divided[i];

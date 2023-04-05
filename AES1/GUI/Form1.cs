@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Media;
 using System.Windows.Forms;
+using System.IO;
 
 namespace GUI
 {
@@ -18,6 +19,7 @@ namespace GUI
         private readonly SoundPlayer hoodclassic;
         private readonly SoundPlayer awp;
         private readonly SoundPlayer damnson;
+        private bool textinput = true;
 
         public AES_Cipher_Tool()
         {
@@ -26,25 +28,55 @@ namespace GUI
             hoodclassic = new SoundPlayer("hoodclassic.wav");
             awp = new SoundPlayer("awp.wav");
             damnson = new SoundPlayer("damnson.wav");
+            cleanFiles();
             InitializeComponent();
-            plaintextBox.TextChanged += plaintextBox_TextChanged;
+        }
+
+        private void cleanFiles()
+        {
+            string nothing = String.Empty;
+
+            using (BinaryWriter writer = new BinaryWriter(File.Open(keyPath, FileMode.Create)))
+            {
+                byte[] byteArray = System.Text.Encoding.UTF8.GetBytes(nothing);
+                writer.Write(byteArray);
+            }
+
+            using (BinaryWriter writer = new BinaryWriter(File.Open(initialMessagePath, FileMode.Create)))
+            {
+                byte[] byteArray = System.Text.Encoding.UTF8.GetBytes(nothing);
+                writer.Write(byteArray);
+            }
+
+            using (BinaryWriter writer = new BinaryWriter(File.Open(encodedPath, FileMode.Create)))
+            {
+                byte[] byteArray = System.Text.Encoding.UTF8.GetBytes(nothing);
+                writer.Write(byteArray);
+            }
+
+            using (BinaryWriter writer = new BinaryWriter(File.Open(decodedPath, FileMode.Create)))
+            {
+                byte[] byteArray = System.Text.Encoding.UTF8.GetBytes(nothing);
+                writer.Write(byteArray);
+            }
         }
 
         private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-
-            data.setCipherKey(slh.getCipherKey(data.getNk()));
-            using (BinaryWriter writer = new BinaryWriter(File.Open(keyPath, FileMode.Create)))
+            if ((data.getNk() == 4) || (data.getNk() == 6) || (data.getNk() == 8))
             {
-                writer.Write(data.getCipherKey());
-            }
+                data.setCipherKey(slh.getCipherKey(data.getNk()));
+                using (BinaryWriter writer = new BinaryWriter(File.Open(keyPath, FileMode.Create)))
+                {
+                    writer.Write(data.getCipherKey());
+                }
 
-            using (BinaryReader reader = new BinaryReader(File.Open(keyPath, FileMode.Open)))
-            {
-                byte[] key = reader.ReadBytes((int)reader.BaseStream.Length);
-                keyBox.Text = System.Text.Encoding.UTF8.GetString(key);
+                using (BinaryReader reader = new BinaryReader(File.Open(keyPath, FileMode.Open)))
+                {
+                    byte[] key = reader.ReadBytes((int)reader.BaseStream.Length);
+                    keyBox.Text = System.Text.Encoding.UTF8.GetString(key);
+                }
             }
-
         }
 
         private void lenBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -65,9 +97,10 @@ namespace GUI
 
         private void mainButton_Click(object sender, EventArgs e)
         {
-            
-;            if (plaintextBox.Text.Length > 0)
+            if (plaintextBox.Text.Length > 0)
             {
+                awp.Play();
+
                 using (BinaryReader reader = new BinaryReader(File.Open(keyPath, FileMode.Open)))
                 {
                     byte[] key = reader.ReadBytes((int)reader.BaseStream.Length);
@@ -76,7 +109,6 @@ namespace GUI
                 }
 
                 data.setMessageString(plaintextBox.Text);
-
 
                 using (BinaryWriter writer = new BinaryWriter(File.Open(initialMessagePath, FileMode.Create)))
                 {
@@ -105,43 +137,52 @@ namespace GUI
                     string strFromFile = System.Text.Encoding.UTF8.GetString(byteArray);
                     ciphertextBox.Text = strFromFile;
                 }
-                awp.Play();
             }
         }
 
         private void decryptButton_Click(object sender, EventArgs e)
         {
-             hoodclassic.Play();
-
             using (BinaryReader reader = new BinaryReader(File.Open(keyPath, FileMode.Open)))
             {
                 byte[] key = reader.ReadBytes((int)reader.BaseStream.Length);
-                data.setNk(key.Length / 32);
+                data.setNk(key.Length / 4);
                 data.setCipherKey(key);
             }
 
-            using (BinaryReader reader = new BinaryReader(File.Open(encodedPath, FileMode.Open)))
+            if ((data.getNk()) == 4 || (data.getNk() == 6) || (data.getNk() == 8)) 
             {
-                byte[] message_1 = reader.ReadBytes((int)reader.BaseStream.Length);
-                data.setMessageCiphered(message_1);
-            }
+                hoodclassic.Play();
 
-            using (BinaryWriter writer = new BinaryWriter(File.Open(decodedPath, FileMode.Create)))
-            {
-                Cipher.AES ihavenoideaforname = new AES();
-                byte[] byteArray = ihavenoideaforname.decode(data.getMessageCiphered(), data.getCipherKey());
-                data.setMessageBytes(byteArray);
-                writer.Write(byteArray);
-            }
+                using (BinaryReader reader = new BinaryReader(File.Open(encodedPath, FileMode.Open)))
+                {
+                    byte[] message_1 = reader.ReadBytes((int)reader.BaseStream.Length);
+                    data.setMessageCiphered(message_1);
+                }
 
-            using (BinaryReader reader = new BinaryReader(File.Open(decodedPath, FileMode.Open)))
-            {
-                byte[] byteArray = reader.ReadBytes((int)reader.BaseStream.Length);
-                string strFromFile = System.Text.Encoding.UTF8.GetString(byteArray);
-                plaintextBox.Text = strFromFile;
+                plaintextBox.Text = "A";
 
- 
-            } 
+                using (BinaryWriter writer = new BinaryWriter(File.Open(decodedPath, FileMode.Create)))
+                {
+                    AES ihavenoideaforname = new AES();
+                    byte[] byteArray = ihavenoideaforname.decode(data.getMessageCiphered(), data.getCipherKey());
+                    data.setMessageBytes(byteArray);
+                    writer.Write(byteArray);
+                }
+
+                plaintextBox.Text = "B";
+
+                textinput = false;
+
+                using (MD5 md5 = MD5.Create())
+                {
+                    byte[] hashBytes = md5.ComputeHash(data.getMessageBytes());
+                    string hashString = BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
+                    checksumBox.Text = hashString;
+                }
+
+                string message = Encoding.UTF8.GetString(data.getMessageBytes());
+                plaintextBox.Text = message;
+            }   
         }
 
         private void keyBox_KeyPress(object sender, KeyPressEventArgs e)
@@ -269,18 +310,26 @@ namespace GUI
 
         private void loadptButton_Click(object sender, EventArgs e)
         {
-
             OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Title = "Load Plaintext";
+            openFileDialog.Title = "Open File";
             openFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             openFileDialog.Multiselect = false;
 
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
                 string fileName = openFileDialog.FileName;
-                data.setMessageBytes(File.ReadAllBytes(fileName));
-            }
+                byte[] imageData = File.ReadAllBytes(fileName);
 
+                using (MD5 md5 = MD5.Create())
+                {
+                    byte[] hashBytes = md5.ComputeHash(imageData);
+                    data.setMessageBytes(imageData);
+                    string hashString = BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
+                    checksumBox.Text = hashString;
+                }
+                textinput = false;
+            }
+            damnson.Play();
             using (BinaryWriter writer = new BinaryWriter(File.Open(initialMessagePath, FileMode.Create)))
             {
                 writer.Write(data.getMessageBytes());
@@ -288,21 +337,45 @@ namespace GUI
 
             string strFromFile = System.Text.Encoding.UTF8.GetString(data.getMessageBytes());
             plaintextBox.Text = strFromFile;
-
-            damnson.Play();
         }
 
         private void plaintextBox_TextChanged(object sender, EventArgs e)
         {
-            string input = plaintextBox.Text;
-            byte[] inputBytes = Encoding.UTF8.GetBytes(input);
-
-            using (MD5 md5 = MD5.Create())
+            if (textinput)
             {
-                byte[] hashBytes = md5.ComputeHash(inputBytes);
-                string hashString = BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
-                checksumBox.Text = hashString;
+                string input = plaintextBox.Text;
+                byte[] inputBytes = Encoding.UTF8.GetBytes(input);
+
+                using (MD5 md5 = MD5.Create())
+                {
+                    byte[] hashBytes = md5.ComputeHash(inputBytes);
+                    string hashString = BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
+                    checksumBox.Text = hashString;
+                }
             }
+            else
+            {
+                textinput = true;
+            }
+        }
+
+        private void ciphertextBox_TextChanged(object sender, EventArgs e)
+        {
+            if (ciphertextBox.Text.Length > 0)
+            {
+                ciphertextBox.Enabled = true;
+            }
+        }
+
+        private void cleanButton_Click(object sender, EventArgs e)
+        {
+            cleanFiles();
+            data = new Data();
+            textinput = true;
+            ciphertextBox.Text = string.Empty;
+            plaintextBox.Text = string.Empty;
+            keyBox.Text = string.Empty;
+            checksumBox.Text = string.Empty;
         }
     }
 }

@@ -41,6 +41,7 @@
             genkButton = new Button();
             loadptButton = new Button();
             checksumBox = new TextBox();
+            cleanButton = new Button();
             SuspendLayout();
             // 
             // plaintextBox
@@ -67,6 +68,7 @@
             // 
             ciphertextBox.BackColor = Color.FromArgb(34, 34, 40);
             ciphertextBox.Cursor = Cursors.IBeam;
+            ciphertextBox.Enabled = false;
             ciphertextBox.Font = new Font("Arial", 11.25F, FontStyle.Regular, GraphicsUnit.Point);
             ciphertextBox.ForeColor = Color.White;
             ciphertextBox.Location = new Point(770, 180);
@@ -76,9 +78,11 @@
             ciphertextBox.Multiline = true;
             ciphertextBox.Name = "ciphertextBox";
             ciphertextBox.PlaceholderText = "Cipher text";
+            ciphertextBox.ReadOnly = true;
             ciphertextBox.Size = new Size(420, 420);
             ciphertextBox.TabIndex = 1;
             ciphertextBox.Tag = "plaintextBox";
+            ciphertextBox.TextChanged += ciphertextBox_TextChanged;
             ciphertextBox.KeyPress += ciphertextBox_KeyPress;
             // 
             // encryptButton
@@ -255,12 +259,29 @@
             checksumBox.Tag = "checksumBox";
             checksumBox.TextAlign = HorizontalAlignment.Center;
             // 
+            // cleanButton
+            // 
+            cleanButton.BackColor = Color.FromArgb(34, 34, 40);
+            cleanButton.FlatAppearance.BorderColor = Color.FromArgb(147, 172, 201);
+            cleanButton.FlatAppearance.BorderSize = 3;
+            cleanButton.FlatStyle = FlatStyle.Flat;
+            cleanButton.Font = new Font("Arial", 11F, FontStyle.Regular, GraphicsUnit.Point);
+            cleanButton.ForeColor = Color.White;
+            cleanButton.Location = new Point(575, 409);
+            cleanButton.Name = "cleanButton";
+            cleanButton.Size = new Size(130, 51);
+            cleanButton.TabIndex = 15;
+            cleanButton.Text = "Clean";
+            cleanButton.UseVisualStyleBackColor = false;
+            cleanButton.Click += cleanButton_Click;
+            // 
             // AES_Cipher_Tool
             // 
             AutoScaleDimensions = new SizeF(9F, 21F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(35, 35, 43);
             ClientSize = new Size(1264, 681);
+            Controls.Add(cleanButton);
             Controls.Add(checksumBox);
             Controls.Add(loadptButton);
             Controls.Add(genkButton);
@@ -304,5 +325,6 @@
         private Button genkButton;
         private Button loadptButton;
         private TextBox checksumBox;
+        private Button cleanButton;
     }
 }

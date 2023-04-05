@@ -1,3 +1,6 @@
+using Cipher;
+using System.Security.Cryptography;
+
 namespace Tests
 {
     [TestClass]
