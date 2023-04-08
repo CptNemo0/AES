@@ -3,9 +3,10 @@
     public class Data
     {
         private byte[] cipherKey;
-        private string messageString;
         private byte[] messageBytes;
         private byte[] messageCiphered;
+        private string messageString;
+        private int initialMessageLenght;
         private int Nk;
 
 
@@ -23,6 +24,8 @@
             messageCiphered[0] = 0;
 
             Nk = 4;
+
+            initialMessageLenght = 0;
         }
 
         public byte[] getCipherKey()
@@ -50,6 +53,11 @@
             return Nk;
         }
 
+        public int getInitialMessageLenght()
+        {
+            return initialMessageLenght;
+        }
+
 
         public void setCipherKey(byte[] K)
         {
@@ -74,6 +82,11 @@
         public void setNk(int nk)
         {
             this.Nk = nk;
+        }
+    
+        public void setInitialMessageLenght(int  initialMessageLenght)
+        {
+            this.initialMessageLenght = initialMessageLenght;
         }
     }
 }

@@ -42,6 +42,7 @@
             loadptButton = new Button();
             checksumBox = new TextBox();
             cleanButton = new Button();
+            listBox1 = new ListBox();
             SuspendLayout();
             // 
             // plaintextBox
@@ -275,12 +276,30 @@
             cleanButton.UseVisualStyleBackColor = false;
             cleanButton.Click += cleanButton_Click;
             // 
+            // listBox1
+            // 
+            listBox1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            listBox1.BackColor = Color.FromArgb(34, 34, 40);
+            listBox1.ColumnWidth = 60;
+            listBox1.Font = new Font("Arial", 11F, FontStyle.Regular, GraphicsUnit.Point);
+            listBox1.ForeColor = Color.White;
+            listBox1.FormattingEnabled = true;
+            listBox1.ItemHeight = 17;
+            listBox1.Items.AddRange(new object[] { "File", "Text" });
+            listBox1.Location = new Point(9, 9);
+            listBox1.Margin = new Padding(0);
+            listBox1.Name = "listBox1";
+            listBox1.Size = new Size(37, 38);
+            listBox1.TabIndex = 16;
+            listBox1.SelectedIndexChanged += listBox1_SelectedIndexChanged_1;
+            // 
             // AES_Cipher_Tool
             // 
             AutoScaleDimensions = new SizeF(9F, 21F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(35, 35, 43);
             ClientSize = new Size(1264, 681);
+            Controls.Add(listBox1);
             Controls.Add(cleanButton);
             Controls.Add(checksumBox);
             Controls.Add(loadptButton);
@@ -326,5 +345,6 @@
         private Button loadptButton;
         private TextBox checksumBox;
         private Button cleanButton;
+        private ListBox listBox1;
     }
 }

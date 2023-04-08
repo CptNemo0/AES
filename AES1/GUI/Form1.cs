@@ -5,6 +5,7 @@ using System.Text;
 using System.Media;
 using System.Windows.Forms;
 using System.IO;
+using System;
 
 namespace GUI
 {
@@ -20,6 +21,7 @@ namespace GUI
         private readonly SoundPlayer awp;
         private readonly SoundPlayer damnson;
         private bool textinput = true;
+        private bool isFileMode = true;
 
         public AES_Cipher_Tool()
         {
@@ -70,12 +72,14 @@ namespace GUI
                 {
                     writer.Write(data.getCipherKey());
                 }
-
+                keyBox.Text = BitConverter.ToString(data.getCipherKey()).Replace("-", "");
+                /*
                 using (BinaryReader reader = new BinaryReader(File.Open(keyPath, FileMode.Open)))
                 {
                     byte[] key = reader.ReadBytes((int)reader.BaseStream.Length);
                     keyBox.Text = System.Text.Encoding.UTF8.GetString(key);
                 }
+                */
             }
         }
 
@@ -97,10 +101,30 @@ namespace GUI
 
         private void mainButton_Click(object sender, EventArgs e)
         {
-            if (plaintextBox.Text.Length > 0)
-            {
-                awp.Play();
+            awp.Play();
 
+            if (data.getCipherKey().Length == 1)
+            {
+                data.setNk(4);
+                data.setCipherKey(slh.getCipherKey(4));
+                keyBox.Text = BitConverter.ToString(data.getCipherKey()).Replace("-", "");
+            }
+
+            if (isFileMode)
+            {
+                int len = data.getMessageBytes().Length;
+
+                if (len > 16)
+                {
+                    data.setInitialMessageLenght(len % 16);
+                }
+                else if (len < 16)
+                {
+                    data.setInitialMessageLenght(16 - len);
+                }
+
+
+                /*
                 using (BinaryReader reader = new BinaryReader(File.Open(keyPath, FileMode.Open)))
                 {
                     byte[] key = reader.ReadBytes((int)reader.BaseStream.Length);
@@ -109,6 +133,7 @@ namespace GUI
                 }
 
                 data.setMessageString(plaintextBox.Text);
+                ////
 
                 using (BinaryWriter writer = new BinaryWriter(File.Open(initialMessagePath, FileMode.Create)))
                 {
@@ -121,20 +146,74 @@ namespace GUI
                 {
                     message_1 = reader.ReadBytes((int)reader.BaseStream.Length);
                 }
+                */
+
+
+                using (SHA256 sha256 = SHA256.Create())
+                {
+                    byte[] hashValue = sha256.ComputeHash(data.getMessageBytes());
+                    string hashString = BitConverter.ToString(hashValue).Replace("-", "");
+                    checksumBox.Text = hashString;
+                }
+
 
                 using (BinaryWriter writer = new BinaryWriter(File.Open(encodedPath, FileMode.Create)))
                 {
                     Cipher.AES ihavenoideaforname = new AES();
-                    byte[] byteArray = ihavenoideaforname.encode(message_1, data.getCipherKey());
+                    byte[] byteArray = ihavenoideaforname.encode(data.getMessageBytes(), data.getCipherKey());
                     writer.Write(byteArray);
-                    string strFromFile = System.Text.Encoding.UTF8.GetString(byteArray);
+                    data.setMessageCiphered(byteArray);
+                    string strFromFile = BitConverter.ToString(data.getMessageCiphered()).Replace("-", "");
                     ciphertextBox.Text = strFromFile;
                 }
 
+                /*
                 using (BinaryReader reader = new BinaryReader(File.Open(encodedPath, FileMode.Open)))
                 {
                     byte[] byteArray = reader.ReadBytes((int)reader.BaseStream.Length);
                     string strFromFile = System.Text.Encoding.UTF8.GetString(byteArray);
+                    ciphertextBox.Text = strFromFile;
+                }
+                */
+            }
+            else
+            {
+                data.setMessageString(plaintextBox.Text);
+
+                using (BinaryWriter writer = new BinaryWriter(File.Open(initialMessagePath, FileMode.Create)))
+                {
+                    byte[] byteArray = System.Text.Encoding.UTF8.GetBytes(data.getMessageString());
+                    data.setMessageBytes(byteArray);
+                    writer.Write(byteArray);
+                }
+
+                int len = data.getMessageBytes().Length;
+
+                if (len > 16)
+                {
+                    data.setInitialMessageLenght(len % 16);
+                }
+                else if (len < 16)
+                {
+                    data.setInitialMessageLenght(16 - len);
+                }
+
+                /*
+                using (SHA256 sha256 = SHA256.Create())
+                {
+                    byte[] hashValue = sha256.ComputeHash(data.getMessageBytes());
+                    string hashString = BitConverter.ToString(hashValue).Replace("-", "");
+                    checksumBox.Text = hashString;
+                }
+                */
+
+                using (BinaryWriter writer = new BinaryWriter(File.Open(encodedPath, FileMode.Create)))
+                {
+                    Cipher.AES ihavenoideaforname = new AES();
+                    byte[] byteArray = ihavenoideaforname.encode(data.getMessageBytes(), data.getCipherKey());
+                    writer.Write(byteArray);
+                    data.setMessageCiphered(byteArray);
+                    string strFromFile = BitConverter.ToString(data.getMessageCiphered()).Replace("-", "");
                     ciphertextBox.Text = strFromFile;
                 }
             }
@@ -149,7 +228,7 @@ namespace GUI
                 data.setCipherKey(key);
             }
 
-            if ((data.getNk()) == 4 || (data.getNk() == 6) || (data.getNk() == 8)) 
+            if ((data.getNk()) == 4 || (data.getNk() == 6) || (data.getNk() == 8))
             {
                 hoodclassic.Play();
 
@@ -159,30 +238,38 @@ namespace GUI
                     data.setMessageCiphered(message_1);
                 }
 
-                plaintextBox.Text = "A";
-
                 using (BinaryWriter writer = new BinaryWriter(File.Open(decodedPath, FileMode.Create)))
                 {
                     AES ihavenoideaforname = new AES();
                     byte[] byteArray = ihavenoideaforname.decode(data.getMessageCiphered(), data.getCipherKey());
-                    data.setMessageBytes(byteArray);
-                    writer.Write(byteArray);
-                }
+                    // if we have encoded message of length 4 bytes it will return this message thus 4 bytes and 12 zeros appended to the end, fix it 
 
-                plaintextBox.Text = "B";
+                    byte[] theactuallone = new byte[byteArray.Length - data.getInitialMessageLenght()];
+
+
+                    for (int i = 0; i < theactuallone.Length; i++)
+                    {
+                        theactuallone[i] = byteArray[i];
+                    }
+                    
+
+                    data.setMessageBytes(theactuallone);
+                    writer.Write(theactuallone);
+                }
 
                 textinput = false;
 
-                using (MD5 md5 = MD5.Create())
+                byte[] hashValue;
+                using (SHA256 sha256 = SHA256.Create())
                 {
-                    byte[] hashBytes = md5.ComputeHash(data.getMessageBytes());
-                    string hashString = BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
+                    hashValue = sha256.ComputeHash(data.getMessageBytes());
+                    string hashString = BitConverter.ToString(hashValue).Replace("-", "");
                     checksumBox.Text = hashString;
                 }
 
-                string message = Encoding.UTF8.GetString(data.getMessageBytes());
-                plaintextBox.Text = message;
-            }   
+                //string message = BitConverter.ToString(data.getMessageBytes()).Replace("-", "");
+                plaintextBox.Text = Encoding.UTF8.GetString(data.getMessageBytes());
+            }
         }
 
         private void keyBox_KeyPress(object sender, KeyPressEventArgs e)
@@ -247,6 +334,21 @@ namespace GUI
                     writer.Write(data.getMessageCiphered());
                 }
             }
+
+            SaveFileDialog saveLenght = new SaveFileDialog();
+            saveLenght.Title = "Save Lenght!";
+            saveLenght.Filter = "Bin files (*.bin)|*.bin";
+            saveLenght.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+
+            if (saveLenght.ShowDialog() == DialogResult.OK)
+            {
+                string fileName = saveLenght.FileName;
+
+                using (StreamWriter writer = new StreamWriter(fileName))
+                {
+                    writer.Write(data.getInitialMessageLenght());
+                }
+            }
         }
 
         private void loadkButton_Click(object sender, EventArgs e)
@@ -273,11 +375,15 @@ namespace GUI
                 writer.Write(data.getCipherKey());
             }
 
+            keyBox.Text = BitConverter.ToString(data.getCipherKey()).Replace("-", "");
+
+            /*
             using (BinaryReader reader = new BinaryReader(File.Open(keyPath, FileMode.Open)))
             {
                 byte[] key = reader.ReadBytes((int)reader.BaseStream.Length);
                 keyBox.Text = System.Text.Encoding.UTF8.GetString(key);
             }
+            */
         }
 
         private void loadctButton_Click(object sender, EventArgs e)
@@ -299,12 +405,28 @@ namespace GUI
                 }
             }
 
+            OpenFileDialog openFileDialogLen = new OpenFileDialog();
+            openFileDialogLen.Title = "Load Lenght!";
+            openFileDialogLen.Filter = "Bin files (*.bin)|*.bin";
+            openFileDialogLen.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            openFileDialogLen.Multiselect = false;
+
+            if (openFileDialogLen.ShowDialog() == DialogResult.OK)
+            {
+                string fileName = openFileDialogLen.FileName;
+
+                using (StreamReader reader = new StreamReader(fileName))
+                {
+                    string line = reader.ReadLine();
+                    data.setInitialMessageLenght(int.Parse(line));
+                }
+            }
+
             using (BinaryWriter writer = new BinaryWriter(File.Open(encodedPath, FileMode.Create)))
             {
                 byte[] byteArray = data.getMessageCiphered();
                 writer.Write(byteArray);
-                string strFromFile = System.Text.Encoding.UTF8.GetString(byteArray);
-                ciphertextBox.Text = strFromFile;
+                ciphertextBox.Text = BitConverter.ToString(byteArray).Replace("-", "");
             }
         }
 
@@ -318,44 +440,40 @@ namespace GUI
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
                 string fileName = openFileDialog.FileName;
-                byte[] imageData = File.ReadAllBytes(fileName);
-
-                using (MD5 md5 = MD5.Create())
-                {
-                    byte[] hashBytes = md5.ComputeHash(imageData);
-                    data.setMessageBytes(imageData);
-                    string hashString = BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
-                    checksumBox.Text = hashString;
-                }
-                textinput = false;
+                data.setMessageBytes(File.ReadAllBytes(fileName));
             }
+
             damnson.Play();
+
             using (BinaryWriter writer = new BinaryWriter(File.Open(initialMessagePath, FileMode.Create)))
             {
                 writer.Write(data.getMessageBytes());
             }
 
-            string strFromFile = System.Text.Encoding.UTF8.GetString(data.getMessageBytes());
-            plaintextBox.Text = strFromFile;
+            plaintextBox.Text = BitConverter.ToString(data.getMessageBytes()).Replace("-", "");
+
+            using (SHA256 sha256 = SHA256.Create())
+            {
+                byte[] hashValue = sha256.ComputeHash(data.getMessageBytes());
+                string hashString = BitConverter.ToString(hashValue).Replace("-", "").ToLower();
+                checksumBox.Text = hashString;
+            }
         }
 
         private void plaintextBox_TextChanged(object sender, EventArgs e)
         {
-            if (textinput)
+            if(!isFileMode)
             {
                 string input = plaintextBox.Text;
                 byte[] inputBytes = Encoding.UTF8.GetBytes(input);
+                data.setMessageBytes(inputBytes);
 
-                using (MD5 md5 = MD5.Create())
+                using (SHA256 sha256 = SHA256.Create())
                 {
-                    byte[] hashBytes = md5.ComputeHash(inputBytes);
-                    string hashString = BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
+                    byte[] hashValue = sha256.ComputeHash(data.getMessageBytes());
+                    string hashString = BitConverter.ToString(hashValue).Replace("-", "");
                     checksumBox.Text = hashString;
                 }
-            }
-            else
-            {
-                textinput = true;
             }
         }
 
@@ -376,6 +494,42 @@ namespace GUI
             plaintextBox.Text = string.Empty;
             keyBox.Text = string.Empty;
             checksumBox.Text = string.Empty;
+        }
+
+        private void listBox1_SelectedIndexChanged_1(object sender, EventArgs e)
+        {
+            if (listBox1.SelectedIndex == 0)
+            {
+                //File Mode
+                cleanFiles();
+                data = new Data();
+                textinput = true;
+                ciphertextBox.Text = string.Empty;
+                plaintextBox.Text = string.Empty;
+                keyBox.Text = string.Empty;
+                checksumBox.Text = string.Empty;
+
+                plaintextBox.Enabled = false;
+                loadptButton.Enabled = true;
+                loadctButton.Enabled = true;
+                isFileMode = true;
+            }
+            else if (listBox1.SelectedIndex == 1)
+            {
+                //Text Mode
+                cleanFiles();
+                data = new Data();
+                textinput = true;
+                ciphertextBox.Text = string.Empty;
+                plaintextBox.Text = string.Empty;
+                keyBox.Text = string.Empty;
+                checksumBox.Text = string.Empty;
+
+                plaintextBox.Enabled = true;
+                loadptButton.Enabled = false;
+                loadctButton.Enabled = false;
+                isFileMode = false;
+            }
         }
     }
 }
