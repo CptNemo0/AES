@@ -101,8 +101,6 @@ namespace GUI
 
         private void mainButton_Click(object sender, EventArgs e)
         {
-            awp.Play();
-
             if (data.getCipherKey().Length == 1)
             {
                 data.setNk(4);
@@ -112,18 +110,6 @@ namespace GUI
 
             if (isFileMode)
             {
-                int len = data.getMessageBytes().Length;
-
-                if (len > 16)
-                {
-                    data.setInitialMessageLenght(len % 16);
-                }
-                else if (len < 16)
-                {
-                    data.setInitialMessageLenght(16 - len);
-                }
-
-
                 /*
                 using (BinaryReader reader = new BinaryReader(File.Open(keyPath, FileMode.Open)))
                 {
@@ -166,7 +152,6 @@ namespace GUI
                     string strFromFile = BitConverter.ToString(data.getMessageCiphered()).Replace("-", "");
                     ciphertextBox.Text = strFromFile;
                 }
-
                 /*
                 using (BinaryReader reader = new BinaryReader(File.Open(encodedPath, FileMode.Open)))
                 {
@@ -187,17 +172,6 @@ namespace GUI
                     writer.Write(byteArray);
                 }
 
-                int len = data.getMessageBytes().Length;
-
-                if (len > 16)
-                {
-                    data.setInitialMessageLenght(len % 16);
-                }
-                else if (len < 16)
-                {
-                    data.setInitialMessageLenght(16 - len);
-                }
-
                 /*
                 using (SHA256 sha256 = SHA256.Create())
                 {
@@ -216,7 +190,16 @@ namespace GUI
                     string strFromFile = BitConverter.ToString(data.getMessageCiphered()).Replace("-", "");
                     ciphertextBox.Text = strFromFile;
                 }
+
+
             }
+            awp.Play();
+
+            int len1 = data.getMessageBytes().Length;
+            int len2 = data.getMessageCiphered().Length;
+            int dif = Math.Abs(len1 - len2);
+            data.setInitialMessageLenght(dif);
+
         }
 
         private void decryptButton_Click(object sender, EventArgs e)
@@ -251,7 +234,7 @@ namespace GUI
                     {
                         theactuallone[i] = byteArray[i];
                     }
-                    
+
 
                     data.setMessageBytes(theactuallone);
                     writer.Write(theactuallone);
@@ -268,7 +251,7 @@ namespace GUI
                 }
 
                 //string message = BitConverter.ToString(data.getMessageBytes()).Replace("-", "");
-                plaintextBox.Text = Encoding.UTF8.GetString(data.getMessageBytes());
+                plaintextBox.Text = BitConverter.ToString(data.getMessageBytes()).Replace("-", "");
             }
         }
 
@@ -443,26 +426,27 @@ namespace GUI
                 data.setMessageBytes(File.ReadAllBytes(fileName));
             }
 
-            damnson.Play();
-
             using (BinaryWriter writer = new BinaryWriter(File.Open(initialMessagePath, FileMode.Create)))
             {
                 writer.Write(data.getMessageBytes());
             }
 
+
             plaintextBox.Text = BitConverter.ToString(data.getMessageBytes()).Replace("-", "");
+            damnson.Play();
 
             using (SHA256 sha256 = SHA256.Create())
             {
                 byte[] hashValue = sha256.ComputeHash(data.getMessageBytes());
-                string hashString = BitConverter.ToString(hashValue).Replace("-", "").ToLower();
+                string hashString = BitConverter.ToString(hashValue).Replace("-", "");
                 checksumBox.Text = hashString;
             }
+
         }
 
         private void plaintextBox_TextChanged(object sender, EventArgs e)
         {
-            if(!isFileMode)
+            if (!isFileMode)
             {
                 string input = plaintextBox.Text;
                 byte[] inputBytes = Encoding.UTF8.GetBytes(input);
@@ -509,7 +493,7 @@ namespace GUI
                 keyBox.Text = string.Empty;
                 checksumBox.Text = string.Empty;
 
-                plaintextBox.Enabled = false;
+                plaintextBox.Enabled = true;
                 loadptButton.Enabled = true;
                 loadctButton.Enabled = true;
                 isFileMode = true;

@@ -80,6 +80,7 @@
             ciphertextBox.Name = "ciphertextBox";
             ciphertextBox.PlaceholderText = "Cipher text";
             ciphertextBox.ReadOnly = true;
+            ciphertextBox.ScrollBars = ScrollBars.Vertical;
             ciphertextBox.Size = new Size(420, 420);
             ciphertextBox.TabIndex = 1;
             ciphertextBox.Tag = "plaintextBox";
@@ -249,7 +250,7 @@
             // checksumBox
             // 
             checksumBox.BackColor = Color.FromArgb(34, 34, 40);
-            checksumBox.Font = new Font("Arial", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            checksumBox.Font = new Font("Arial", 8F, FontStyle.Regular, GraphicsUnit.Point);
             checksumBox.ForeColor = Color.White;
             checksumBox.Location = new Point(90, 576);
             checksumBox.Multiline = true;
